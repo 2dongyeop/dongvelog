@@ -1,5 +1,6 @@
 package com.dongvelog.global.exception;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -12,6 +13,7 @@ public class ErrorResponse {
     private final String message;
     private final Map<String, String> validation = new HashMap<>();
 
+    @Builder
     public ErrorResponse(final String code, final String message) {
         this.code = code;
         this.message = message;
