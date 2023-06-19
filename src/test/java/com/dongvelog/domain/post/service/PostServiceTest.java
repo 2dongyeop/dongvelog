@@ -1,6 +1,7 @@
 package com.dongvelog.domain.post.service;
 
 import com.dongvelog.domain.post.controller.request.CreatePostRequest;
+import com.dongvelog.domain.post.controller.request.EditPost;
 import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.entity.Post;
@@ -62,7 +63,7 @@ class PostServiceTest {
 
         //then -- 검증
         assertThat(postResponse).isNotNull();
-        assertThat(postResponse.title()).isEqualTo(savedPost.getTitle());
+        assertThat(postResponse.getTitle()).isEqualTo(savedPost.getTitle());
     }
 
 
@@ -88,6 +89,59 @@ class PostServiceTest {
 
         //then -- 검증
         assertThat(posts.size()).isEqualTo(10);
-        assertThat(posts.get(0).title()).isEqualTo("동벨롭 : 19");
+        assertThat(posts.get(0).getTitle()).isEqualTo("동벨롭 : 19");
+    }
+
+
+    @Test
+    @DisplayName("글 제목 수정")
+    public void 글_제목_수정() throws Exception {
+        //given -- 조건
+        final Post post = postRepository.save(Post.builder()
+                .title("이동엽")
+                .content("반포자이")
+                .build());
+
+        postRepository.save(post);
+
+        final EditPost editPost = EditPost.builder()
+                .title("이동걸")
+                .build();
+
+        //when -- 동작
+        postService.edit(post.getId(), editPost);
+
+        //then -- 검증
+        final Post findPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id = " + post.getId()));
+
+        assertThat(findPost.getTitle()).isEqualTo("이동걸");
+    }
+
+
+    @Test
+    @DisplayName("글 내용 수정")
+    public void 글_내용_수정() throws Exception {
+        //given -- 조건
+        final Post post = postRepository.save(Post.builder()
+                .title("이동엽")
+                .content("반포자이")
+                .build());
+
+        postRepository.save(post);
+
+        final EditPost editPost = EditPost.builder()
+                .title("이동엽")
+                .content("둥지아파트")
+                .build();
+
+        //when -- 동작
+        postService.edit(post.getId(), editPost);
+
+        //then -- 검증
+        final Post findPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id = " + post.getId()));
+
+        assertThat(findPost.getContent()).isEqualTo("둥지아파트");
     }
 }

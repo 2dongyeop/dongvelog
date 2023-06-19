@@ -1,6 +1,7 @@
 package com.dongvelog.controller;
 
 import com.dongvelog.domain.post.controller.request.CreatePostRequest;
+import com.dongvelog.domain.post.controller.request.EditPost;
 import com.dongvelog.domain.post.entity.Post;
 import com.dongvelog.domain.post.repository.PostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +20,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -174,6 +174,30 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", Matchers.is(10)))
                 .andExpect(jsonPath("$[0].title").value("동벨롭 : 19"))
+                .andDo(print());
+    }
+
+
+    @Test
+    @DisplayName("글 제목 수정")
+    public void 글제목수정() throws Exception {
+        //given -- 조건
+        final Post post = Post.builder()
+                .title("이동엽")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        final EditPost editPost = EditPost.builder()
+                .title("이동엽")
+                .content("둥지아파트")
+                .build();
+
+        //expected
+        mockMvc.perform(patch("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editPost)))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

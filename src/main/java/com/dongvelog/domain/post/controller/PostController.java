@@ -1,6 +1,7 @@
 package com.dongvelog.domain.post.controller;
 
 import com.dongvelog.domain.post.controller.request.CreatePostRequest;
+import com.dongvelog.domain.post.controller.request.EditPost;
 import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.service.PostService;
@@ -34,5 +35,10 @@ public class PostController {
     public List<PostResponse> getList(@ModelAttribute final SearchPost searchPost) {
 
         return postService.getList(searchPost);
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public PostResponse edit(@PathVariable final Long postId, @RequestBody @Valid final EditPost request) {
+        return postService.edit(postId, request);
     }
 }

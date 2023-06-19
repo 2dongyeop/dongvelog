@@ -25,4 +25,17 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+
+    public PostEditor.PostEditorBuilder toEditor() {
+
+        return PostEditor.builder()
+                .title(title)
+                .content(content);
+        //build() 하지 않고 넘기는게 중요!
+    }
+
+    public void edit(final PostEditor postEditor) {
+        this.title = postEditor.title();
+        this.content = postEditor.content();
+    }
 }
