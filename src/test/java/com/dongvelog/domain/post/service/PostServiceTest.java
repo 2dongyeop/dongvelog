@@ -1,6 +1,7 @@
 package com.dongvelog.domain.post.service;
 
 import com.dongvelog.domain.post.controller.request.CreatePostRequest;
+import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.entity.Post;
 import com.dongvelog.domain.post.repository.PostRepository;
@@ -9,15 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @SpringBootTest
 class PostServiceTest {
@@ -70,9 +68,9 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 1페이지 조회 조회")
-    public void 글페이징조회() throws Exception {
+    public void 글_여러개_페이징조회() throws Exception {
         //given -- 조건
-        final List<Post> requestPosts = IntStream.range(1, 31)
+        final List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("동벨롭 : " + i)
                         .content("취업 " + i + "일차 회고록")
@@ -81,13 +79,15 @@ class PostServiceTest {
 
         postRepository.saveAll(requestPosts);
 
-        final Pageable pageable = PageRequest.of(0, 5, DESC, "id");
+        final SearchPost searchPost = SearchPost.builder()
+                .page(1)
+                .build();
 
         //when -- 동작
-        final List<PostResponse> posts = postService.getList(pageable);
+        final List<PostResponse> posts = postService.getList(searchPost);
 
         //then -- 검증
-        assertThat(posts.size()).isEqualTo(5);
-        assertThat(posts.get(0).title()).isEqualTo("동벨롭 : 30");
+        assertThat(posts.size()).isEqualTo(10);
+        assertThat(posts.get(0).title()).isEqualTo("동벨롭 : 19");
     }
 }

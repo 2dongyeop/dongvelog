@@ -1,12 +1,12 @@
 package com.dongvelog.domain.post.service;
 
 import com.dongvelog.domain.post.controller.request.CreatePostRequest;
+import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.entity.Post;
 import com.dongvelog.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,8 +38,8 @@ public class PostService {
                 .build();
     }
 
-    public List<PostResponse> getList(final Pageable pageable) {
-        return postRepository.findAll(pageable).stream()
+    public List<PostResponse> getList(final SearchPost searchPost) {
+        return postRepository.getList(searchPost).stream()
                 .map(getPostResponse())
                 .toList();
     }

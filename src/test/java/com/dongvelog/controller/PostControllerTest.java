@@ -134,9 +134,9 @@ class PostControllerTest {
 
 
     @Test
-    public void 글여러개조회() throws Exception {
+    public void 글_여러개_페이징_querydsl_조회() throws Exception {
         //given -- 조건
-        final List<Post> requestPosts = IntStream.range(1, 31)
+        final List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("동벨롭 : " + i)
                         .content("취업 " + i + "일차 회고록")
@@ -146,14 +146,34 @@ class PostControllerTest {
         postRepository.saveAll(requestPosts);
 
         //expected
-        mockMvc.perform(get("/posts?page=1&sort=id,desc")
+        mockMvc.perform(get("/posts?page=1&size=10")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(5)))
-                .andExpect(jsonPath("$[0].id").value(30))
+                .andExpect(jsonPath("$.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$[0].id").value(20))
+                .andExpect(jsonPath("$[0].title").value("동벨롭 : 19"))
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("페이지를 0으로 요청해도 첫 페이지를 가져온다.(현재 1이 기본값)")
+    public void 글_여러개_페이징_querydsl_조회2() throws Exception {
+        //given -- 조건
+        final List<Post> requestPosts = IntStream.range(0, 20)
+                .mapToObj(i -> Post.builder()
+                        .title("동벨롭 : " + i)
+                        .content("취업 " + i + "일차 회고록")
+                        .build())
+                .collect(Collectors.toList());
 
+        postRepository.saveAll(requestPosts);
 
+        //expected
+        mockMvc.perform(get("/posts?page=0&size=10")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(10)))
+                .andExpect(jsonPath("$[0].title").value("동벨롭 : 19"))
+                .andDo(print());
+    }
 }
