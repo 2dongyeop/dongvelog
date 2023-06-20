@@ -21,6 +21,8 @@ public class PostController {
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid final CreatePostRequest createPostRequest) {
+
+        createPostRequest.validate();
         postService.write(createPostRequest);
     }
 
@@ -40,5 +42,10 @@ public class PostController {
     @PatchMapping("/posts/{postId}")
     public PostResponse edit(@PathVariable final Long postId, @RequestBody @Valid final EditPost request) {
         return postService.edit(postId, request);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable final Long postId) {
+        postService.delete(postId);
     }
 }

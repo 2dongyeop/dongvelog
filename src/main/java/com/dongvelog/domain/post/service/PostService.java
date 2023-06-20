@@ -7,6 +7,7 @@ import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.entity.Post;
 import com.dongvelog.domain.post.entity.PostEditor;
 import com.dongvelog.domain.post.repository.PostRepository;
+import com.dongvelog.global.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class PostService {
     public PostResponse get(final Long id) {
 
         final Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFoundException::new);
 
         return PostResponse.builder()
                 .id(post.getId())
@@ -53,7 +54,7 @@ public class PostService {
     @Transactional
     public PostResponse edit(final Long id, final EditPost editPost) {
         final Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(PostNotFoundException::new);
 
         final PostEditor.PostEditorBuilder editorBuilder = post.toEditor();
 
@@ -74,5 +75,14 @@ public class PostService {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .build();
+    }
+
+    @Transactional
+    public void delete(final Long postId) {
+
+        final Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+
+        postRepository.delete(post);
     }
 }

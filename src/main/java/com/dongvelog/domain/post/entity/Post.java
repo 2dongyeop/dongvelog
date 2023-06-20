@@ -35,7 +35,7 @@ public class Post {
     }
 
     public void edit(final PostEditor postEditor) {
-        this.title = postEditor.title();
-        this.content = postEditor.content();
+        this.title = postEditor.getTitle();
+        this.content = postEditor.getContent();
     }
 }

@@ -1,5 +1,6 @@
 package com.dongvelog.domain.post.controller.request;
 
+import com.dongvelog.global.exception.InvalidRequestException;
 import lombok.Builder;
 
 import javax.validation.constraints.NotBlank;
@@ -18,5 +19,11 @@ public record CreatePostRequest(
                 "title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 '}';
+    }
+
+    public void validate() {
+        if (title.contains("바보")) {
+            throw new InvalidRequestException("title", "제목에 바보를 포함할 수 없습니다.");
+        }
     }
 }

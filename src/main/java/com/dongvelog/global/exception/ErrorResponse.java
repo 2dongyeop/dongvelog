@@ -3,7 +3,6 @@ package com.dongvelog.global.exception;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,12 +10,13 @@ import java.util.Objects;
 public class ErrorResponse {
     private final String code;
     private final String message;
-    private final Map<String, String> validation = new HashMap<>();
+    private final Map<String, String> validation;
 
     @Builder
-    public ErrorResponse(final String code, final String message) {
+    public ErrorResponse(final String code, final String message, final Map<String, String> validation) {
         this.code = code;
         this.message = message;
+        this.validation = validation;
     }
 
     public void addValidation(final String fieldName, final String errorMessage) {
