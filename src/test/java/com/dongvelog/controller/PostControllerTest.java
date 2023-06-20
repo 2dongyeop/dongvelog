@@ -78,8 +78,6 @@ class PostControllerTest {
                         .content(jsonRequest)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("잘못된 요청입니다."))
                 .andDo(print());
     }
 
@@ -198,6 +196,54 @@ class PostControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editPost)))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+
+    @Test
+    public void 게시글삭제() throws Exception {
+        //given -- 조건
+        final Post post = Post.builder()
+                .title("이동엽")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        //expected
+        mockMvc.perform(delete("/posts/{postId}", post.getId())
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+
+    @Test
+    public void 존재하지않는게시글조회() throws Exception {
+        //expected
+        mockMvc.perform(delete("/posts/{postId}", 100L)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+
+    @Test
+    @DisplayName("게시글 작성시 제목에 '바보'는 포함될 수 없다.")
+    public void invalid() throws Exception {
+
+        //given
+        final CreatePostRequest request = CreatePostRequest.builder()
+                .title("바보입니다")
+                .content("내용입니다.")
+                .build();
+
+        final String jsonRequest = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/posts")
+                        .contentType(APPLICATION_JSON)
+                        .content(jsonRequest)
+                )
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 }

@@ -6,6 +6,7 @@ import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.entity.Post;
 import com.dongvelog.domain.post.repository.PostRepository;
+import com.dongvelog.global.exception.PostNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class PostServiceTest {
@@ -120,8 +122,8 @@ class PostServiceTest {
 
 
     @Test
-    @DisplayName("글 내용 수정")
-    public void 글_내용_수정() throws Exception {
+    @DisplayName("글 내용 수정2 : 본문만 수정할거면 제목에 Null을 넘긴다. 이때 제목은 안바뀌어야함")
+    public void 글_내용_수정2() throws Exception {
         //given -- 조건
         final Post post = postRepository.save(Post.builder()
                 .title("이동엽")
@@ -131,7 +133,7 @@ class PostServiceTest {
         postRepository.save(post);
 
         final EditPost editPost = EditPost.builder()
-                .title("이동엽")
+                .title(null)
                 .content("둥지아파트")
                 .build();
 
@@ -142,6 +144,42 @@ class PostServiceTest {
         final Post findPost = postRepository.findById(post.getId())
                 .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id = " + post.getId()));
 
+        assertThat(findPost.getTitle()).isEqualTo("이동엽");
         assertThat(findPost.getContent()).isEqualTo("둥지아파트");
+    }
+
+
+    @Test
+    public void 게시글삭제() throws Exception {
+        //given -- 조건
+        final Post post = postRepository.save(Post.builder()
+                .title("이동엽")
+                .content("반포자이")
+                .build());
+
+        postRepository.save(post);
+
+        //when -- 동작
+        postService.delete(post.getId());
+
+        //then -- 검증
+        assertThat(postRepository.count()).isEqualTo(0);
+    }
+
+
+    @Test
+    @DisplayName("글 1개 조회 실패 테스트")
+    public void 글조회실패시() throws Exception {
+        //given -- 조건
+        postRepository.save(Post.builder()
+                .title("제목")
+                .content("내용")
+                .build());
+
+        //expected
+        final PostNotFoundException e = assertThrows(PostNotFoundException.class, () ->
+                postService.get(100L), "예외처리가 잘못 되었어요.");
+
+        assertThat(e.getMessage()).isEqualTo("존재하지 않는 글입니다.");
     }
 }
