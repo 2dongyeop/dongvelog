@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+*nodeenv-16*
+
 ### STS ###
 .apt_generated
 .classpath
