@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -56,7 +57,7 @@ public class PostControllerDocTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("index",
+                .andDo(document("post-inquiry",
                         pathParameters(
                                 parameterWithName("postId").description("게시글 ID")
                         ),
@@ -87,10 +88,12 @@ public class PostControllerDocTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("index",
+                .andDo(document("post-create",
                         requestFields(
-                            fieldWithPath("title").description("제목"),
+                            fieldWithPath("title").description("제목")
+                                    .attributes(Attributes.key("constraint").value("좋은 제목을 입력하세요.")),
                             fieldWithPath("content").description("내용")
+                                    .optional()
                         )
                 ));
     }
