@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from "vue";
+// import { defineProps, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
