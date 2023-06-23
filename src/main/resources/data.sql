@@ -1,0 +1,1 @@
+INSERT INTO `users` (name, email, password, created_at) VALUES ('이동엽', 'ldy12@naver.com', '1234', '2023-06-23 11:41:00');

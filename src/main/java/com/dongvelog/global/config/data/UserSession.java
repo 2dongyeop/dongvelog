@@ -2,5 +2,9 @@ package com.dongvelog.global.config.data;
 
 public class UserSession {
 
-    public String name;
+    private final Long id;
+
+    public UserSession(Long id) {
+        this.id = id;
+    }
 }

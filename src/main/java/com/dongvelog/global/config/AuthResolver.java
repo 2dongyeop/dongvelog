@@ -23,8 +23,9 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
             throw new UnauthorizedException();
         }
 
-        final UserSession userSession = new UserSession();
-        userSession.name = accessToken;
-        return userSession;
+        //데이터베이스 사용자 확인작업
+        //...
+
+        return new UserSession(1L);
     }
 }
