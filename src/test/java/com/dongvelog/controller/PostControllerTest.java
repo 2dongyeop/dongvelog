@@ -63,7 +63,7 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("/posts 요청시 title 값은 필수다.")
+    @DisplayName("글 작성 요청시 title 값은 필수다.")
     public void test2() throws Exception {
 
         //given
@@ -74,6 +74,7 @@ class PostControllerTest {
         final String jsonRequest = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(post("/posts")
+                        .header("authorization", "dongyeop")
                         .contentType(APPLICATION_JSON)
                         .content(jsonRequest)
                 )
@@ -82,7 +83,7 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("/posts 요청시 DB에 값이 저장된다.")
+    @DisplayName("글 작성 요청시 DB에 값이 저장된다.")
     public void test3() throws Exception {
         //given
         final CreatePostRequest request = CreatePostRequest.builder()
