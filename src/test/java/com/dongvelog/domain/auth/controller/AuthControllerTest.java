@@ -1,6 +1,7 @@
 package com.dongvelog.domain.auth.controller;
 
 import com.dongvelog.domain.auth.controller.request.LoginRequest;
+import com.dongvelog.domain.session.entity.Session;
 import com.dongvelog.domain.session.repository.SessionRepository;
 import com.dongvelog.domain.user.entity.User;
 import com.dongvelog.domain.user.repository.UserRepository;
@@ -12,13 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -61,13 +65,13 @@ class AuthControllerTest {
                 .build());
 
         //when -- 동작
-        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(post("/auth/login")
+                        .contentType(APPLICATION_JSON)
                         .content(request))
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(print());
 
         //then -- 검증
-        response.andExpect(MockMvcResultMatchers.status().isOk());
+        response.andExpect(status().isOk());
     }
 
 
@@ -90,15 +94,15 @@ class AuthControllerTest {
                 .build());
 
         //when -- 동작
-        final ResultActions response = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+        final ResultActions response = mockMvc.perform(post("/auth/login")
+                        .contentType(APPLICATION_JSON)
                         .content(request))
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(print());
 
         //then -- 검증
         final User loginUser = userRepository.findById(user.getId()).get();
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
+        response.andExpect(status().isOk());
         Assertions.assertThat(loginUser.getSessions().size()).isEqualTo(1);
     }
 
@@ -121,15 +125,67 @@ class AuthControllerTest {
                 .build());
 
         //when -- 동작
-        final ResultActions response = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+        final ResultActions response = mockMvc.perform(post("/auth/login")
+                        .contentType(APPLICATION_JSON)
                         .content(request))
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(print());
 
         //then -- 검증
         final User loginUser = userRepository.findById(user.getId()).get();
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
-        response.andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").isNotEmpty());
+        response.andExpect(status().isOk());
+        response.andExpect(jsonPath("$.accessToken").isNotEmpty());
+    }
+
+
+    @Test
+    @DisplayName("로그인 후 권한이 필요한 페이지에 접속한다. /foo")
+    public void 로그인후권한이필요한페이지에접속() throws Exception {
+
+        //given
+        User user = new User(
+                "name",
+                "email@email.com",
+                "1234"
+        );
+        final Session session = user.addSession();
+        userRepository.save(user);
+
+
+        //when -- 동작
+        final ResultActions response
+                = mockMvc.perform(get("/foo")
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", session.getAccessToken()))
+                .andDo(print());
+
+        //then -- 검증
+        response.andExpect(status().isOk());
+    }
+
+
+    @Test
+    @DisplayName("로그인 후 검증되지않은 세션값으로 접속할 수 ㅇ벗다.")
+    public void test123() throws Exception {
+
+        //given
+        User user = new User(
+                "name",
+                "email@email.com",
+                "1234"
+        );
+        final Session session = user.addSession();
+        userRepository.save(user);
+
+
+        //when -- 동작
+        final ResultActions response
+                = mockMvc.perform(get("/foo")
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", session.getAccessToken() + "0da"))
+                .andDo(print());
+
+        //then -- 검증
+        response.andExpect(status().isUnauthorized());
     }
 }

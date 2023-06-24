@@ -1,10 +1,5 @@
 package com.dongvelog.global.config.data;
 
-public class UserSession {
+public record UserSession(Long id) {
 
-    private final Long id;
-
-    public UserSession(Long id) {
-        this.id = id;
-    }
 }

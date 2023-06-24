@@ -5,6 +5,7 @@ import com.dongvelog.domain.post.controller.request.EditPost;
 import com.dongvelog.domain.post.controller.request.SearchPost;
 import com.dongvelog.domain.post.controller.response.PostResponse;
 import com.dongvelog.domain.post.service.PostService;
+import com.dongvelog.global.config.data.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,17 @@ public class PostController {
     private final PostService postService;
 
 
+    @GetMapping("/foo")
+    public Long foo(UserSession userSession) {
+        log.info(">>> {}", userSession.id());
+        return userSession.id();
+    }
+
+
+    @GetMapping("/bar")
+    public String bar(UserSession userSession) {
+        return "인증이 필요한 페이지";
+    }
 
 
     @PostMapping("/posts")

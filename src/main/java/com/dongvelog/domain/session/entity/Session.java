@@ -23,7 +23,7 @@ public class Session {
     //TODO : 만료시간
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User user;
 
 
