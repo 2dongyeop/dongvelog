@@ -6,11 +6,13 @@ import com.dongvelog.global.config.data.UserSession;
 import com.dongvelog.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 public class AuthResolver implements HandlerMethodArgumentResolver {
@@ -25,10 +27,18 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        final String accessToken = webRequest.getHeader("Authorization");
-        if (!StringUtils.hasText(accessToken)) {
+        final HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
+        if (servletRequest == null) {
             throw new UnauthorizedException();
         }
+
+        final Cookie[] cookies = servletRequest.getCookies();
+        if (cookies.length == 0) {
+            throw new UnauthorizedException();
+        }
+
+
+        final String accessToken = cookies[0].getValue();
 
         //데이터베이스 사용자 확인작업
         //...
