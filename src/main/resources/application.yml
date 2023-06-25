@@ -1,4 +1,8 @@
 spring:
+  profiles:
+    include:
+      - jwt
+
   h2:
     console:
       enabled: true
