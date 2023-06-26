@@ -1,6 +1,7 @@
 package com.dongvelog.domain.auth.controller;
 
 import com.dongvelog.domain.auth.controller.request.LoginRequest;
+import com.dongvelog.domain.auth.controller.request.SignUpRequest;
 import com.dongvelog.domain.auth.controller.response.SessionResponse;
 import com.dongvelog.domain.auth.service.AuthService;
 import com.dongvelog.global.config.AppConfig;
@@ -36,5 +37,12 @@ public class AuthController {
                 .compact();
 
         return new SessionResponse(jws);
+    }
+
+
+    @PostMapping("/auth/logout")
+    public void signup(@RequestBody SignUpRequest signUpRequest) {
+
+        authService.signup(signUpRequest);
     }
 }
