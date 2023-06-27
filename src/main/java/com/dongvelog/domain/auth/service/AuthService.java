@@ -7,6 +7,7 @@ import com.dongvelog.domain.user.repository.UserRepository;
 import com.dongvelog.global.exception.AlreadyExistEmailException;
 import com.dongvelog.global.exception.LoginFailException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,19 @@ public class AuthService {
             throw new AlreadyExistEmailException();
         }
 
-        User user = new User(signUpRequest.getName(), signUpRequest.getEmail(), signUpRequest.getPassword());
+        final SCryptPasswordEncoder encoder = new SCryptPasswordEncoder(
+                16,
+                8,
+                1,
+                32,
+                64);
+
+        final String encryptedPassword = encoder.encode(signUpRequest.getPassword());
+
+        final User user = new User(
+                signUpRequest.getName(),
+                signUpRequest.getEmail(),
+                encryptedPassword);
 
         userRepository.save(user);
     }
