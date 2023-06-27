@@ -16,14 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
     @Transactional
     public Long signIn(LoginRequest request) {
 
         final User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(InvalidSigninInformation::new);
-
-        PasswordEncoder encoder = new PasswordEncoder();
 
         boolean result = encoder.matches(request.getPassword(), user.getPassword());
         if (!result) {
@@ -39,7 +38,6 @@ public class AuthService {
             throw new AlreadyExistEmailException();
         }
 
-        PasswordEncoder encoder = new PasswordEncoder();
         final String encryptedPassword = encoder.encode(signUpRequest.getPassword());
 
         final User user = new User(
