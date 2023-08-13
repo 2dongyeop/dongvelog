@@ -3,7 +3,7 @@ package com.dongvelog.domain.post.controller.request;
 import com.dongvelog.global.exception.InvalidRequestException;
 import lombok.Builder;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public record CreatePostRequest(
         @NotBlank(message = "타이틀을 입력해주세요.") String title,
