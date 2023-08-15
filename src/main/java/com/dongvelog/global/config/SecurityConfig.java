@@ -1,23 +1,29 @@
 package com.dongvelog.global.config;
 
+import com.dongvelog.domain.user.entity.User;
+import com.dongvelog.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity(debug = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UserRepository userRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -31,7 +37,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests()
-                    .requestMatchers("/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
                     .anyRequest().authenticated()
 
                 .and()
@@ -46,27 +53,33 @@ public class SecurityConfig {
                 .rememberMe(rm -> rm.rememberMeParameter("remember")
                         .alwaysRemember(false)
                         .tokenValiditySeconds(2952000))
-                .userDetailsService(userDetailsService())
+                .userDetailsService(userDetailsService(userRepository))
                 .csrf().disable()
                 .build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+    public UserDetailsService userDetailsService(final UserRepository repository) {
 
-        UserDetails user = User.withUsername("dongvelop")
-                .password("test")
-                .roles("ADMIN")
-                .build();
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+                final User user = repository.findByEmail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException(username + "찾을 수 없습니다."));
 
-        manager.createUser(user);
-
-        return manager;
+                return new UserPrincipal(user);
+            }
+        };
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new SCryptPasswordEncoder(
+                16,
+                8,
+                1,
+                32,
+                64
+        );
     }
 }
