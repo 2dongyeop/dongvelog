@@ -8,8 +8,15 @@ import java.util.List;
 public class UserPrincipal extends User {
 
     private final Long userId;
+
+    /*
+    *
+    * ROLE_ADMIN -> 역할
+    * ADMIN -> 권한
+    * */
+
     public UserPrincipal(com.dongvelog.domain.user.entity.User user) {
-        super(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("ADMIN")));
+        super(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
         this.userId = user.getId();
     }
 
