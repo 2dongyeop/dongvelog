@@ -16,7 +16,7 @@ public class UserPrincipal extends User {
     * */
 
     public UserPrincipal(com.dongvelog.domain.user.entity.User user) {
-        super(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        super(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_USER")));
         this.userId = user.getId();
     }
 
